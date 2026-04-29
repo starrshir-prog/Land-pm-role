@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Role Radar — Shir Star</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: #f4f5f9; color: #1a1a2e; font-size: 13px; line-height: 1.5; min-height: 100vh; }
+.nav { background: #fff; border-bottom: 1px solid #e8eaf2; height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; position: sticky; top: 0; z-index: 100; }
+.nav-brand { display: flex; align-items: center; gap: 10px; }
+.nav-icon { width: 28px; height: 28px; background: #5b52f0; border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+.nav-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; }
+.nav-sub { font-size: 11px; color: #9a9ab5; margin-top: 1px; }
+.nav-tabs { display: flex; background: #f4f5f9; border-radius: 8px; padding: 3px; gap: 2px; }
+.nav-tab { padding: 5px 14px; border: none; background: transparent; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; color: #9a9ab5; cursor: pointer; transition: all 0.15s; }
+.nav-tab.on { background: #fff; color: #1a1a2e; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.badge { background: #ff6584; color: #fff; border-radius: 10px; padding: 1px 6px; font-size: 10px; margin-left: 4px; display: none; }
+.page { display: none; }
+.page.on { display: block; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 24px; }
+.input-card { background: #fff; border: 1px solid #e8eaf2; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.clabel { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: #9a9ab5; margin-bottom: 10px; }
+.url-warn { background: #fff8ed; border: 1px solid #f5c96a; border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #92520a; margin-bottom: 10px; display: none; }
+textarea.jdinput { width: 100%; border: 1px solid #e8eaf2; border-radius: 8px; padding: 10px 12px; font-family: 'Inter', sans-serif; font-size: 13px; color: #1a1a2e; resize: vertical; min-height: 100px; outline: none; background: #fafbfd; transition: border-color 0.15s; }
+textarea.jdinput:focus { border-color: #5b52f0; }
+textarea.jdinput::placeholder { color: #c0c2d8; }
+.input-foot { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.btn-primary { background: #5b52f0; color: #fff; border: none; border-radius: 8px; padding: 9px 18px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.loadrow { display: none; align-items: center; gap: 8px; color: #9a9ab5; font-size: 12px; }
+.loadrow.on { display: flex; }
+.spinner { width: 14px; height: 14px; border: 2px solid #e8eaf2; border-top-color: #5b52f0; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+@media (max-width: 780px) { .grid2 { grid-template-columns: 1fr; } }
+.panel { background: #fff; border: 1px solid #e8eaf2; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+.panel-head { padding: 14px 16px 0; }
+.panel-body { padding: 14px 16px; }
+.role-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.role-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
+.role-co { font-size: 12px; color: #9a9ab5; margin-top: 2px; }
+.mpill { display: inline-block; border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: 600; }
+.mph { background: #dcfce7; color: #14532d; }
+.mpm { background: #fef3c7; color: #78350f; }
+.mpl { background: #fee2e2; color: #7f1d1d; }
+.tagrow { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 14px; }
+.tag { display: inline-block; background: #eeedfe; color: #4c3fb0; border-radius: 5px; padding: 3px 8px; font-size: 11px; font-weight: 500; }
+.tag-r { background: #fee2e2; color: #991b1b; }
+.tag-g { background: #dcfce7; color: #14532d; }
+.kwtag { display: inline-block; background: #fff0f3; border: 1px solid #fcc9d3; color: #be185d; border-radius: 5px; padding: 2px 7px; font-size: 11px; margin: 2px; font-style: italic; }
+.sbox { border-left: 2px solid #5b52f0; border-radius: 0 8px 8px 0; background: #f5f4ff; padding: 10px 12px; font-size: 12px; line-height: 1.6; color: #3730a3; margin-bottom: 10px; }
+.fbox-g { border-left: 2px solid #16a34a; border-radius: 0 8px 8px 0; background: #f0fdf4; padding: 10px 12px; font-size: 12px; line-height: 1.6; color: #14532d; }
+.fbox-r { border-left: 2px solid #ef4444; border-radius: 0 8px 8px 0; background: #fef2f2; padding: 10px 12px; font-size: 12px; line-height: 1.6; color: #7f1d1d; }
+.minilabel { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #9a9ab5; margin: 12px 0 6px; }
+.strat { background: #f9fafb; border: 1px solid #e8eaf2; border-radius: 8px; padding: 10px 12px; font-size: 12px; line-height: 1.6; color: #4a4a6a; margin-bottom: 12px; }
+.cvblock { background: #f9fafb; border: 1px solid #e8eaf2; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
+.cv-old { font-size: 11px; color: #b0b3c8; text-decoration: line-through; margin-bottom: 5px; }
+.cv-new { font-size: 12px; color: #1a1a2e; line-height: 1.5; border-left: 2px solid #16a34a; padding-left: 8px; }
+.cv-why { font-size: 11px; color: #9a9ab5; margin-top: 5px; }
+.aprrow { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+.btn-approve { background: #16a34a; color: #fff; border: none; border-radius: 7px; padding: 7px 14px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; }
+.btn-approve:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-ghost { background: transparent; border: 1px solid #e8eaf2; border-radius: 7px; padding: 7px 12px; font-family: 'Inter', sans-serif; font-size: 12px; color: #6b6b8a; cursor: pointer; }
+.btn-ghost:hover { border-color: #5b52f0; color: #5b52f0; }
+.cvstatus { font-size: 11px; color: #9a9ab5; margin-top: 8px; }
+.msgtabs { display: flex; border-bottom: 1px solid #e8eaf2; }
+.msgtab { padding: 10px 16px; font-size: 12px; font-weight: 500; color: #9a9ab5; cursor: pointer; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; background: transparent; }
+.msgtab.on { color: #5b52f0; border-bottom-color: #5b52f0; }
+.msgpane { display: none; padding: 14px 16px; }
+.msgpane.on { display: block; }
+.tolabel { font-size: 11px; color: #9a9ab5; margin-bottom: 6px; }
+textarea.msgarea { width: 100%; border: 1px solid #e8eaf2; border-radius: 8px; padding: 10px 12px; font-family: 'Inter', sans-serif; font-size: 12px; line-height: 1.6; color: #1a1a2e; resize: vertical; outline: none; background: #fafbfd; }
+textarea.msgarea:focus { border-color: #5b52f0; }
+.msgactions { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
+.btn-copy { background: #5b52f0; color: #fff; border: none; border-radius: 7px; padding: 6px 12px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; cursor: pointer; }
+.btn-regen { background: transparent; border: 1px solid #e8eaf2; border-radius: 7px; padding: 6px 10px; font-family: 'Inter', sans-serif; font-size: 11px; color: #6b6b8a; cursor: pointer; }
+.copyok { font-size: 11px; color: #16a34a; display: none; }
+.refnamerow { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.refnamerow label { font-size: 11px; color: #9a9ab5; white-space: nowrap; }
+input.refname { border: 1px solid #e8eaf2; border-radius: 7px; padding: 6px 10px; font-family: 'Inter', sans-serif; font-size: 12px; color: #1a1a2e; outline: none; width: 150px; background: #fafbfd; }
+input.refname:focus { border-color: #5b52f0; }
+.cvbadge { font-size: 11px; margin-bottom: 8px; }
+.botrow { display: flex; gap: 8px; margin-top: 4px; margin-bottom: 4px; }
+.twrap { background: #fff; border: 1px solid #e8eaf2; border-radius: 12px; overflow: hidden; }
+.thead { padding: 16px 20px 0; }
+.thint { font-size: 11px; color: #9a9ab5; margin: 4px 0 14px; }
+table.ttable { width: 100%; border-collapse: collapse; }
+table.ttable th { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #9a9ab5; padding: 8px 16px; text-align: left; border-bottom: 1px solid #e8eaf2; }
+table.ttable td { padding: 13px 16px; border-bottom: 1px solid #f0f1f7; font-size: 12px; vertical-align: middle; }
+table.ttable tr:last-child td { border-bottom: none; }
+table.ttable tr.trow:hover { background: #f7f7ff; cursor: pointer; }
+.td-role { font-weight: 600; color: #5b52f0; }
+.td-co { color: #6b6b8a; }
+.td-date { color: #9a9ab5; }
+.delbtn { background: transparent; border: 1px solid #fca5a5; border-radius: 6px; padding: 3px 8px; font-size: 11px; color: #ef4444; cursor: pointer; }
+.emptystate { text-align: center; padding: 48px 20px; color: #9a9ab5; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">
+    <div class="nav-icon">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="white" stroke-width="1.5"/><circle cx="7" cy="7" r="2" fill="white"/></svg>
+    </div>
+    <div>
+      <div class="nav-name">Role Radar</div>
+      <div class="nav-sub">Shir Star &middot; PM Job Search</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="nav-tabs">
+      <button class="nav-tab on" onclick="showPage('analyze')">Analyze role</button>
+      <button class="nav-tab" onclick="showPage('tracker')">Saved roles <span class="badge" id="badge">0</span></button>
+    </div>
+    <button onclick="changeApiKey()" style="background:transparent;border:1px solid #e8eaf2;border-radius:7px;padding:5px 10px;font-family:Inter,sans-serif;font-size:11px;color:#6b6b8a;cursor:pointer" id="keyBtn">&#128273; API Key</button>
+  </div>
+</nav>
+
+<div class="page on" id="page-analyze">
+  <div class="wrap">
+    <div class="input-card">
+      <div class="clabel">Job description</div>
+      <div class="url-warn" id="urlWarn">URLs are not supported &mdash; paste the job description text instead.</div>
+      <textarea class="jdinput" id="jobInput" placeholder="Paste the full job description here (from LinkedIn, Greenhouse, Lever, etc.)"></textarea>
+      <div class="input-foot">
+        <button class="btn-primary" id="analyzeBtn" onclick="analyzeJob()">Analyze &rarr;</button>
+        <div class="loadrow" id="loadrow"><div class="spinner"></div><span id="loadtxt">Reading...</span></div>
+      </div>
+    </div>
+
+    <div id="results" style="display:none">
+      <div class="grid2">
+        <div>
+          <div class="panel">
+            <div class="panel-head"><div class="clabel">Overview</div></div>
+            <div class="panel-body" id="ovBody"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div class="clabel">CV tailoring</div></div>
+            <div class="panel-body" id="cvBody"></div>
+          </div>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="panel-head"><div class="clabel">Outreach messages</div></div>
+            <div class="msgtabs">
+              <button class="msgtab on" onclick="switchMsgTab('hm')">Hiring manager</button>
+              <button class="msgtab" onclick="switchMsgTab('ref')">Referral</button>
+            </div>
+            <div class="msgpane on" id="pane-hm"></div>
+            <div class="msgpane" id="pane-ref"></div>
+          </div>
+        </div>
+      </div>
+      <div class="botrow">
+        <button class="btn-ghost" onclick="resetForm()">&#8617; New search</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-tracker">
+  <div class="wrap">
+    <div class="twrap">
+      <div class="thead">
+        <div class="clabel">Recent searches</div>
+        <div class="thint">Saved automatically after each analysis. Click any row to restore.</div>
+      </div>
+      <div id="trackerBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- API Key Modal -->
+<div id="keyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;padding:28px;width:420px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,0.12)">
+    <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px">Enter your Anthropic API Key</div>
+    <div style="font-size:12px;color:#9a9ab5;margin-bottom:18px;line-height:1.5">Get your key at <a href="https://console.anthropic.com" target="_blank" style="color:#5b52f0">console.anthropic.com</a>. It's saved only in your browser's localStorage — never stored anywhere else.</div>
+    <input id="keyInput" type="password" placeholder="sk-ant-..." onkeydown="if(event.key==='Enter')saveKey()" style="width:100%;border:1px solid #e8eaf2;border-radius:8px;padding:10px 12px;font-family:Inter,sans-serif;font-size:13px;outline:none;margin-bottom:8px;background:#fafbfd;color:#1a1a2e" />
+    <div id="keyErr" style="display:none;font-size:11px;color:#ef4444;margin-bottom:10px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="closeKeyModal()" style="background:transparent;border:1px solid #e8eaf2;border-radius:7px;padding:8px 14px;font-family:Inter,sans-serif;font-size:12px;color:#6b6b8a;cursor:pointer">Cancel</button>
+      <button onclick="saveKey()" style="background:#5b52f0;color:#fff;border:none;border-radius:7px;padding:8px 16px;font-family:Inter,sans-serif;font-size:12px;font-weight:600;cursor:pointer">Save key</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var CV_ORIGINAL = "SHIR STAR | Senior Product Manager\nEmail: Starrshir@gmail.com | Location: Hoboken, NJ | LinkedIn: linkedin.com/in/shir-star\n\nPROFILE:\nProduct manager with 7+ years of experience driving high-impact products across Fintech and Enterprise sectors. Expert in Product Strategy and Monetization, with a proven track record of scaling B2B platforms and financial ecosystems. Vast experience in leading end-to-end feature releases, working with GTM teams, and translating complex customer needs into actionable product roadmaps.\n\nWORK EXPERIENCE:\n\nAT&T | Senior Technical Product Manager | 03/2025 - Present\n- Zero-to-one leadership: Leading cross-functional vision and GTM strategy for GenAI tools and software intelligence platforms, transforming complex infrastructure into high-engagement solutions for global engineering teams. Built LevelUp Hub - an SDLC observability platform integrating JFrog, Jira, GitHub, and security scanning into an interactive dashboard tracking DORA metrics and GenAI adoption.\n- Cross-functional influence: Collaborating with Marketing, Design, and Research to communicate value propositions of GenAI suite to customers.\n\nTipalti | Senior Product Manager | 2022 - 2025\n- Strategic product execution: Led core product efforts to expand Tipalti's B2B2C reach, building vision and strategy for modern financial services in Procurement and AP domains.\n- Zero-to-one financial innovation: Led end-to-end development of Tipalti's first Procurement tool.\n- Market impact: Led continuous improvement of Procurement solution, generating $2M in new revenue and expanding TAM.\n\nAsurion | Product Manager | 2020 - 2022\n- Strategic integration management: Managed end-to-end integration of Asurion with AT&T to drive large-scale organizational revenue.\n- Revenue results: AT&T integration generated ~$10M in revenue within first year.\n- Product lifecycle leadership: Directed entire product lifecycle with focus on user flows and cross-functional communication.\n\nAsurion | Senior Product Analyst | 2019 - 2020\n- Optimized features and sales funnels through A/B testing and churn analysis.\n- Translated complex SQL-based data into persuasive recommendations for stakeholders.\n\nEDUCATION: B.Sc. Industrial Engineering & Management (Information Systems), Technion - 2017\nSKILLS: Zero-to-one product development, Market & competitor research, Financial services (Payments/AP/Expenses), GTM strategy, Cross-functional leadership, SQL, Python, Workflow automation, API management, Low-code/no-code tools";
+
+var currentAnalysis = null;
+var cvApproved = false;
+var approvedCVText = '';
+var savedRoles = [];
+try { savedRoles = JSON.parse(localStorage.getItem('rr4') || '[]'); } catch(e) {}
+
+window.addEventListener('DOMContentLoaded', function() {
+  updateBadge();
+  updateKeyBtn();
+  if (!ANTHROPIC_KEY) showKeyModal();
+});
+
+function updateBadge() {
+  var b = document.getElementById('badge');
+  if (!b) return;
+  b.textContent = savedRoles.length;
+  b.style.display = savedRoles.length ? 'inline' : 'none';
+}
+
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(function(el) { el.classList.remove('on'); });
+  document.querySelectorAll('.nav-tab').forEach(function(t, i) {
+    t.classList.toggle('on', (i===0&&p==='analyze')||(i===1&&p==='tracker'));
+  });
+  document.getElementById('page-'+p).classList.add('on');
+  if (p === 'tracker') renderTracker();
+}
+
+function switchMsgTab(t) {
+  document.querySelectorAll('.msgtab').forEach(function(el, i) {
+    el.classList.toggle('on', (i===0&&t==='hm')||(i===1&&t==='ref'));
+  });
+  document.getElementById('pane-hm').classList.toggle('on', t==='hm');
+  document.getElementById('pane-ref').classList.toggle('on', t==='ref');
+}
+
+function setLoading(msg) {
+  document.getElementById('loadrow').classList.add('on');
+  document.getElementById('loadtxt').textContent = msg;
+  document.getElementById('analyzeBtn').disabled = true;
+}
+
+function stopLoading() {
+  document.getElementById('loadrow').classList.remove('on');
+  document.getElementById('analyzeBtn').disabled = false;
+}
+
+var ANTHROPIC_KEY = localStorage.getItem('rr_apikey') || '';
+
+async function callClaude(sys, usr) {
+  if (!ANTHROPIC_KEY) {
+    showKeyModal();
+    throw new Error('API key required — enter it above');
+  }
+  var res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': ANTHROPIC_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 4000, system: sys, messages: [{ role: 'user', content: usr }] })
+  });
+  if (res.status === 401) {
+    localStorage.removeItem('rr_apikey');
+    ANTHROPIC_KEY = '';
+    showKeyModal('Invalid key — please check and try again.');
+    throw new Error('Invalid API key');
+  }
+  if (!res.ok) throw new Error('API error ' + res.status);
+  var data = await res.json();
+  return data.content[0].text;
+}
+
+function safeJSON(raw, fallback) {
+  try {
+    var c = raw.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/i,'').trim();
+    var s = c.indexOf('{'), e = c.lastIndexOf('}');
+    if (s !== -1 && e !== -1) c = c.slice(s, e+1);
+    return JSON.parse(c);
+  } catch(err) {
+    console.error('JSON parse fail:', raw);
+    return fallback;
+  }
+}
+
+async function analyzeJob() {
+  var input = document.getElementById('jobInput').value.trim();
+  if (!input) return;
+  var warn = document.getElementById('urlWarn');
+  if (/^https?:\/\//i.test(input)) { warn.style.display = 'block'; return; }
+  warn.style.display = 'none';
+  cvApproved = false; approvedCVText = '';
+  document.getElementById('results').style.display = 'none';
+
+  try {
+    setLoading('Extracting role details...');
+    var jiRaw = await callClaude(
+      'Extract structured job info. Return ONLY valid JSON, no markdown fences, no backticks.',
+      'Extract from this job posting. Return JSON only:\n{"title":"job title","company":"company name","location":"location or null","keyRequirements":["req1","req2","req3","req4"],"keywordsFromJD":["4-6 exact keyword phrases from JD"],"hiringManagerName":"name if mentioned else null","matchScore":75,"matchReason":"1 honest sentence","gaps":["gap1"],"roleSummary":"2-3 sentences: what this role is really about and the top 2-3 things they need","fitSummary":"2-3 honest sentences on whether Shir is a fit. Her background: 7+ yrs PM, Tipalti procurement/AP $2M rev, AT&T SDLC GenAI, Asurion $10M integration. Be honest about gaps."}\nJob posting:\n' + input
+    );
+    var ji = safeJSON(jiRaw, {title:'PM Role',company:'Company',location:'',keyRequirements:[],keywordsFromJD:[],hiringManagerName:null,matchScore:75,matchReason:'',gaps:[],roleSummary:'',fitSummary:''});
+
+    setLoading('Tailoring CV...');
+    var cdRaw = await callClaude(
+      "You are a PM career coach. Write in Shir's voice: direct, confident, no buzzwords. Return ONLY valid JSON, no markdown fences, no backticks.",
+      "Shir's CV:\n" + CV_ORIGINAL + "\n\nJob posting:\n" + input + "\n\nRole: " + ji.title + " at " + ji.company + "\nJD keywords: " + (ji.keywordsFromJD||[]).join(', ') + "\n\nSuggest CV tweaks. Rewrite naturally in Shir's voice.\n\nReturn JSON:\n{\"summaryTweak\":\"rewritten profile 2-3 sentences natural voice\",\"bulletChanges\":[{\"original\":\"first 10 words of original bullet\",\"improved\":\"rewritten in Shir voice\",\"reason\":\"plain english why — ref exact JD words\",\"jdKeywords\":[\"phrase\"]}],\"skillsToHighlight\":[\"skill1\",\"skill2\"],\"overallRationale\":\"2-3 sentences: JD themes that drove changes\"}"
+    );
+    var cd = safeJSON(cdRaw, {summaryTweak:'',bulletChanges:[],skillsToHighlight:[],overallRationale:''});
+    approvedCVText = buildTailoredCV(cd);
+
+    setLoading('Writing outreach...');
+    var odRaw = await callClaude(
+      'Write like a real human. Casual, sharp, not corporate. Return ONLY valid JSON, no markdown fences, no backticks.',
+      'LinkedIn outreach from Shir Star to hiring manager at ' + ji.company + ' for ' + ji.title + '.\nShir: 7+ yrs PM, fintech Tipalti $2M rev, enterprise AT&T $10M rev, zero-to-one builder, SDLC platform.\nTone: smart person texting. Confident direct. Max 4 sentences. No buzzwords.\nHM name: ' + (ji.hiringManagerName || '[Hiring Manager Name]') + '\nReturn JSON: {"hiringManagerName":"...","message":"..."}'
+    );
+    var od = safeJSON(odRaw, {hiringManagerName:'[Hiring Manager]',message:''});
+
+    setLoading('Building referral template...');
+    var rdRaw = await callClaude(
+      'Write like texting a colleague you respect. Warm casual brief. Return ONLY valid JSON, no markdown fences, no backticks.',
+      'Short referral request from Shir to a connection at ' + ji.company + ' for ' + ji.title + '. Under 5 sentences. Use [Contact Name] placeholder.\nReturn JSON: {"message":"..."}'
+    );
+    var rd = safeJSON(rdRaw, {message:''});
+
+    currentAnalysis = { ji: ji, cd: cd, od: od, rd: rd, input: input, timestamp: new Date().toISOString() };
+    autoSaveRole(currentAnalysis);
+    renderResults(ji, cd, od, rd);
+
+  } catch(err) {
+    console.error(err);
+    document.getElementById('loadtxt').textContent = 'Something went wrong — try again.';
+    setTimeout(stopLoading, 3000);
+    return;
+  }
+
+  stopLoading();
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function buildTailoredCV(cd) {
+  var cv = CV_ORIGINAL;
+  if (cd.summaryTweak) cv = cv.replace(/PROFILE:\n[\s\S]*?\n\nWORK/, 'PROFILE:\n' + cd.summaryTweak + '\n\nWORK');
+  return cv;
+}
+
+function renderResults(ji, cd, od, rd) {
+  var mpc = ji.matchScore >= 75 ? 'mph' : ji.matchScore >= 50 ? 'mpm' : 'mpl';
+
+  var ov = '<div class="role-row"><div><div class="role-title">' + ji.title + '</div><div class="role-co">' + ji.company + (ji.location ? ' &middot; ' + ji.location : '') + '</div></div><span class="mpill ' + mpc + '">' + ji.matchScore + '%</span></div>';
+  ov += '<div class="tagrow">' + (ji.keyRequirements||[]).map(function(r){ return '<span class="tag">'+r+'</span>'; }).join('') + (ji.gaps||[]).map(function(g){ return '<span class="tag tag-r">Gap: '+g+'</span>'; }).join('') + '</div>';
+  if (ji.roleSummary) ov += '<div class="minilabel">What this role is about</div><div class="sbox">' + ji.roleSummary + '</div>';
+  if (ji.fitSummary) ov += '<div class="minilabel">' + (ji.matchScore >= 60 ? "Why you're a good fit" : "Fit assessment") + '</div><div class="' + (ji.matchScore >= 60 ? 'fbox-g' : 'fbox-r') + '">' + ji.fitSummary + '</div>';
+  if (ji.keywordsFromJD && ji.keywordsFromJD.length) ov += '<div class="minilabel">JD keywords</div><div>' + ji.keywordsFromJD.map(function(k){ return '<span class="kwtag">"'+k+'"</span>'; }).join('') + '</div>';
+  document.getElementById('ovBody').innerHTML = ov;
+
+  var origSummary = (CV_ORIGINAL.match(/PROFILE:\n([\s\S]*?)\n\nWORK/) || ['',''])[1].trim();
+  var cv = '';
+  if (cd.overallRationale) cv += '<div class="minilabel">Tailoring strategy</div><div class="strat">' + cd.overallRationale + '</div>';
+  cv += '<div class="minilabel">Profile summary</div><div class="cvblock"><div class="cv-old">' + origSummary + '</div><div class="cv-new">' + cd.summaryTweak + '</div></div>';
+  if (cd.bulletChanges && cd.bulletChanges.length) {
+    cv += '<div class="minilabel">Bullet improvements</div>';
+    cd.bulletChanges.forEach(function(b) {
+      var kw = (b.jdKeywords||[]).map(function(k){ return '<span class="kwtag">"'+k+'"</span>'; }).join(' ');
+      cv += '<div class="cvblock"><div class="cv-old">' + b.original + '...</div><div class="cv-new">' + b.improved + '</div><div class="cv-why">' + b.reason + (kw ? ' &mdash; ' + kw : '') + '</div></div>';
+    });
+  }
+  if (cd.skillsToHighlight && cd.skillsToHighlight.length) {
+    cv += '<div class="minilabel">Lead with these skills</div><div class="tagrow">' + cd.skillsToHighlight.map(function(s){ return '<span class="tag tag-g">'+s+'</span>'; }).join('') + '</div>';
+  }
+  cv += '<div class="aprrow"><button class="btn-approve" id="approveBtn" onclick="approveCv()">Approve tailored CV</button><button class="btn-ghost" onclick="rejectCv()">Keep original</button></div><div class="cvstatus" id="cvStatus">Not approved yet &mdash; referral will use original CV</div>';
+  document.getElementById('cvBody').innerHTML = cv;
+
+  document.getElementById('pane-hm').innerHTML = '<div class="tolabel">To: ' + od.hiringManagerName + '</div><textarea class="msgarea" id="outreachMsg" rows="7">' + od.message + '</textarea><div class="msgactions"><button class="btn-copy" onclick="copyMsg(\'outreachMsg\',\'ckHM\')">Copy</button><button class="btn-regen" onclick="regenOutreach()">Regenerate</button><span class="copyok" id="ckHM">Copied!</span></div>';
+
+  renderReferralPane(rd);
+}
+
+function renderReferralPane(rd) {
+  var cvToUse = cvApproved ? approvedCVText : CV_ORIGINAL;
+  var cvLabel = cvApproved ? '&#10003; Using tailored CV' : 'Using original CV &mdash; approve above to switch';
+  var cvColor = cvApproved ? '#16a34a' : '#d97706';
+  var jd = currentAnalysis ? currentAnalysis.input.substring(0, 600) + (currentAnalysis.input.length > 600 ? '...' : '') : '';
+  var fullMsg = (rd.message || '') + '\n\n--- Job Description ---\n' + jd + '\n\n--- My CV ---\n' + cvToUse;
+  document.getElementById('pane-ref').innerHTML = '<div class="cvbadge" style="color:' + cvColor + '">' + cvLabel + '</div><div class="refnamerow"><label>Contact name</label><input class="refname" id="refName" placeholder="e.g. Maya" oninput="updateRefName()" /></div><textarea class="msgarea" id="refMsg" rows="12">' + fullMsg + '</textarea><div class="msgactions"><button class="btn-copy" onclick="copyMsg(\'refMsg\',\'ckRef\')">Copy message + CV</button><span class="copyok" id="ckRef">Copied!</span></div>';
+}
+
+function updateRefName() {
+  var n = document.getElementById('refName').value.trim();
+  if (!n) return;
+  var ta = document.getElementById('refMsg');
+  if (ta) ta.value = ta.value.replace(/\[Contact Name\]/g, n);
+}
+
+function approveCv() {
+  cvApproved = true;
+  if (currentAnalysis) currentAnalysis.cvApproved = true;
+  document.getElementById('cvStatus').innerHTML = '<span style="color:#16a34a">&#10003; Tailored CV approved</span>';
+  var btn = document.getElementById('approveBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Approved'; }
+  if (currentAnalysis) renderReferralPane(currentAnalysis.rd);
+}
+
+function rejectCv() {
+  cvApproved = false;
+  document.getElementById('cvStatus').textContent = 'Using original CV';
+  var btn = document.getElementById('approveBtn');
+  if (btn) { btn.disabled = false; btn.textContent = 'Approve tailored CV'; }
+  if (currentAnalysis) renderReferralPane(currentAnalysis.rd);
+}
+
+function copyMsg(id, okId) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.value || el.textContent).then(function() {
+    var ok = document.getElementById(okId);
+    if (ok) { ok.style.display = 'inline'; setTimeout(function(){ ok.style.display = 'none'; }, 2000); }
+  });
+}
+
+async function regenOutreach() {
+  if (!currentAnalysis) return;
+  setLoading('Regenerating...');
+  try {
+    var ji = currentAnalysis.ji;
+    var raw = await callClaude('Casual human voice. Return ONLY valid JSON, no fences.', 'Different outreach from Shir for ' + ji.title + ' at ' + ji.company + '. New angle. Max 4 sentences. Return JSON: {"message":"..."}');
+    var d = safeJSON(raw, {message:''});
+    if (d.message) document.getElementById('outreachMsg').value = d.message;
+  } catch(e) {}
+  stopLoading();
+}
+
+function autoSaveRole(analysis) {
+  if (!analysis) return;
+  var ji = analysis.ji;
+  var id = (ji.company + '_' + ji.title).replace(/\s+/g,'_').toLowerCase().replace(/[^a-z0-9_]/g,'');
+  var record = { id: id, title: ji.title, company: ji.company, matchScore: ji.matchScore, timestamp: analysis.timestamp, cvApproved: false, analysis: JSON.parse(JSON.stringify(analysis)) };
+  savedRoles = savedRoles.filter(function(r){ return r.id !== id; });
+  savedRoles.unshift(record);
+  try { localStorage.setItem('rr4', JSON.stringify(savedRoles)); } catch(e) {}
+  updateBadge();
+}
+
+function loadRole(id) {
+  var rec = savedRoles.find(function(r){ return r.id === id; });
+  if (!rec || !rec.analysis) return;
+  currentAnalysis = rec.analysis;
+  cvApproved = rec.cvApproved || false;
+  approvedCVText = cvApproved ? buildTailoredCV(rec.analysis.cd) : '';
+  document.getElementById('jobInput').value = rec.analysis.input || '';
+  showPage('analyze');
+  document.getElementById('results').style.display = 'block';
+  renderResults(rec.analysis.ji, rec.analysis.cd, rec.analysis.od, rec.analysis.rd);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetForm() {
+  document.getElementById('jobInput').value = '';
+  document.getElementById('results').style.display = 'none';
+  currentAnalysis = null; cvApproved = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function deleteRole(id) {
+  savedRoles = savedRoles.filter(function(r){ return r.id !== id; });
+  try { localStorage.setItem('rr4', JSON.stringify(savedRoles)); } catch(e) {}
+  updateBadge();
+  renderTracker();
+}
+
+function showKeyModal(errMsg) {
+  var m = document.getElementById('keyModal');
+  var ei = document.getElementById('keyInput');
+  var em = document.getElementById('keyErr');
+  if (ANTHROPIC_KEY) ei.value = ANTHROPIC_KEY;
+  em.textContent = errMsg || '';
+  em.style.display = errMsg ? 'block' : 'none';
+  m.style.display = 'flex';
+  setTimeout(function(){ ei.focus(); }, 50);
+}
+
+function closeKeyModal() {
+  document.getElementById('keyModal').style.display = 'none';
+}
+
+function saveKey() {
+  var k = document.getElementById('keyInput').value.trim();
+  var em = document.getElementById('keyErr');
+  if (!k) {
+    localStorage.removeItem('rr_apikey');
+    ANTHROPIC_KEY = '';
+    updateKeyBtn();
+    closeKeyModal();
+    return;
+  }
+  if (!k.startsWith('sk-')) {
+    em.textContent = 'Key should start with sk-ant-...';
+    em.style.display = 'block';
+    return;
+  }
+  localStorage.setItem('rr_apikey', k);
+  ANTHROPIC_KEY = k;
+  updateKeyBtn();
+  closeKeyModal();
+}
+
+function changeApiKey() { showKeyModal(); }
+
+function updateKeyBtn() {
+  var btn = document.getElementById('keyBtn');
+  if (!btn) return;
+  if (ANTHROPIC_KEY) {
+    btn.style.borderColor = '#16a34a';
+    btn.style.color = '#16a34a';
+    btn.textContent = '🔑 Key saved';
+  } else {
+    btn.style.borderColor = '#e8eaf2';
+    btn.style.color = '#6b6b8a';
+    btn.textContent = '🔑 Add API Key';
+  }
+}
+
+function renderTracker() {
+  var el = document.getElementById('trackerBody');
+  if (!savedRoles.length) { el.innerHTML = '<div class="emptystate">No roles saved yet. Analyze a role and it will appear here automatically.</div>'; return; }
+  var rows = savedRoles.map(function(r) {
+    var mpc = r.matchScore >= 75 ? 'mph' : r.matchScore >= 50 ? 'mpm' : 'mpl';
+    return '<tr class="trow" onclick="loadRole(\'' + r.id + '\')">' +
+      '<td class="td-role">' + r.title + '</td>' +
+      '<td class="td-co">' + r.company + '</td>' +
+      '<td><span class="mpill ' + mpc + '">' + r.matchScore + '%</span></td>' +
+      '<td style="color:' + (r.cvApproved?'#16a34a':'#9a9ab5') + '">' + (r.cvApproved?'Tailored':'Original') + '</td>' +
+      '<td class="td-date">' + new Date(r.timestamp).toLocaleDateString() + '</td>' +
+      '<td><button class="delbtn" onclick="event.stopPropagation();deleteRole(\'' + r.id + '\')">&#10005;</button></td>' +
+    '</tr>';
+  }).join('');
+  el.innerHTML = '<table class="ttable"><thead><tr><th>Role</th><th>Company</th><th>Match</th><th>CV</th><th>Date</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+</script>
+</body>
+</html>
